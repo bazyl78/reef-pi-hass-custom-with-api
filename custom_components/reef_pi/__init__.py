@@ -50,6 +50,52 @@ REEFPI_DATETIME_FORMAT = "%b-%d-%H:%M, %Y"
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: CONFIG_OPTIONS}, extra=vol.ALLOW_EXTRA)
 
+async def async_handle_call_api(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle service call to make a generic Reef‑pi API request."""
+    endpoint = call.data["endpoint"]
+    method = call.data["method"].upper()
+    payload = call.data.get("payload", {})
+
+    # Retrieve the coordinator from the stored data for this entry.
+    # (This assumes the coordinator is stored under hass.data[DOMAIN][entry_id])
+    for entry_id, data in hass.data[DOMAIN].items():
+        if isinstance(data, dict) and "coordinator" in data:
+            coordinator = data["coordinator"]
+            break
+    else:
+        _LOGGER.error("No Reef‑pi coordinator found.")
+        return
+
+    # Ensure we are authenticated.
+    if not coordinator.api.is_authenticated():
+        try:
+            await coordinator.api.authenticate(coordinator.username, coordinator.password)
+            _LOGGER.debug("Authenticated to Reef‑pi successfully.")
+        except Exception as err:
+            _LOGGER.error("Authentication to Reef‑pi failed: %s", err)
+            return
+
+    # Construct the full URL (assumes coordinator.api.host holds the base URL)
+    full_url = f"{coordinator.api.host}{endpoint}"
+
+    session = async_get_clientsession(hass)
+    try:
+        if method == "GET":
+            async with session.get(full_url) as response:
+                result = await response.json()
+        elif method == "POST":
+            async with session.post(full_url, json=payload) as response:
+                result = await response.json()
+        else:
+            _LOGGER.error("Unsupported HTTP method: %s", method)
+            return
+
+        _LOGGER.info("Reef‑pi API call result: %s", result)
+        # Optionally, store the result in a state for debugging.
+        hass.states.async_set(f"{DOMAIN}.last_api_result", str(result))
+    except Exception as e:
+        _LOGGER.error("Error during API call to %s: %s", full_url, e)
+
 
 async def async_setup(hass: HomeAssistant, config: Config) -> bool:
     """Set up configured."""
