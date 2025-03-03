@@ -122,6 +122,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    # Register the new service for generic Reef‑pi API calls.
+    hass.services.async_register(DOMAIN, SERVICE_CALL_API, async_handle_call_api, schema=SERVICE_SCHEMA)
+    
     return True
 
 
