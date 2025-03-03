@@ -7,7 +7,7 @@
 ![GitHub Latest Release](https://img.shields.io/github/downloads/tdragon/reef-pi-hass-custom/latest/total)
 
 
-# Home Assistant Reef Pi Integration
+# Home Assistant Reef Pi Integration (WITH API)
 
 This custom integration provides a way to monitor sensors data and control equipment connected to [Reef-Pi (An open source reef tank controller based on Raspberry Pi)](http://reef-pi.github.io/) ([GIT repository](https://github.com/reef-pi/reef-pi/releases)).
 
