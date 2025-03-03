@@ -50,14 +50,13 @@ REEFPI_DATETIME_FORMAT = "%b-%d-%H:%M, %Y"
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: CONFIG_OPTIONS}, extra=vol.ALLOW_EXTRA)
 
-async def async_handle_call_api(hass: HomeAssistant, call: ServiceCall) -> None:
-    """Handle service call to make a generic Reef‑pi API request."""
+async def async_handle_call_api(call: ServiceCall) -> None:
+    hass = call.hass  # get the hass instance from the call
     endpoint = call.data["endpoint"]
     method = call.data["method"].upper()
     payload = call.data.get("payload", {})
 
-    # Retrieve the coordinator from the stored data for this entry.
-    # (This assumes the coordinator is stored under hass.data[DOMAIN][entry_id])
+    # Retrieve the coordinator (example logic):
     for entry_id, data in hass.data[DOMAIN].items():
         if isinstance(data, dict) and "coordinator" in data:
             coordinator = data["coordinator"]
@@ -66,7 +65,7 @@ async def async_handle_call_api(hass: HomeAssistant, call: ServiceCall) -> None:
         _LOGGER.error("No Reef‑pi coordinator found.")
         return
 
-    # Ensure we are authenticated.
+    # Ensure we're authenticated.
     if not coordinator.api.is_authenticated():
         try:
             await coordinator.api.authenticate(coordinator.username, coordinator.password)
@@ -75,9 +74,8 @@ async def async_handle_call_api(hass: HomeAssistant, call: ServiceCall) -> None:
             _LOGGER.error("Authentication to Reef‑pi failed: %s", err)
             return
 
-    # Construct the full URL (assumes coordinator.api.host holds the base URL)
+    # Construct the full URL.
     full_url = f"{coordinator.api.host}{endpoint}"
-
     session = async_get_clientsession(hass)
     try:
         if method == "GET":
@@ -91,7 +89,7 @@ async def async_handle_call_api(hass: HomeAssistant, call: ServiceCall) -> None:
             return
 
         _LOGGER.info("Reef‑pi API call result: %s", result)
-        # Optionally, store the result in a state for debugging.
+        # Optionally, store the result for debugging.
         hass.states.async_set(f"{DOMAIN}.last_api_result", str(result))
     except Exception as e:
         _LOGGER.error("Error during API call to %s: %s", full_url, e)
