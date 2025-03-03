@@ -13,6 +13,8 @@ from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.core import ServiceCall
+import homeassistant.helpers.config_validation as cv
 
 from .async_api import CannotConnect, InvalidAuth, ReefApi
 from .const import (
@@ -30,6 +32,16 @@ from .const import (
 )
 
 # TODO List the platforms that you want to support.
+
+
+SERVICE_CALL_API = "call_api"
+SERVICE_SCHEMA = vol.Schema({
+    vol.Required("endpoint"): cv.string,           # e.g., "/api/doser/calibrate"
+    vol.Optional("method", default="GET"): cv.string,  # "GET" or "POST"
+    vol.Optional("payload", default={}): dict,         # JSON payload if needed
+})
+
+
 # For your initial PR, limit it to 1 platform.
 PLATFORMS = ["sensor", "switch", "light", "binary_sensor", "button"]
 
