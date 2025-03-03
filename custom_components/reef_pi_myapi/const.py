@@ -5,7 +5,7 @@ from datetime import timedelta
 
 import voluptuous as vol
 
-DOMAIN = "reef_pi"
+DOMAIN = "reef_pi_myapi"
 MANUFACTURER = "reef-pi.github.io"
 
 HOST = "host"
