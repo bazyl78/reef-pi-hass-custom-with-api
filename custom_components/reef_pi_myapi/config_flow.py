@@ -1,4 +1,4 @@
-"""Config flow for ha_reef_pi integration."""
+"""Config flow for ha_reef_pi_myapi integration."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ async def validate_input(_hass: HomeAssistant, data: dict[str, Any]) -> dict[str
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for ha_reef_pi."""
+    """Handle a config flow for ha_reef_pi_myapi."""
 
     VERSION = 1
 
