@@ -15,6 +15,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.core import ServiceCall
 import homeassistant.helpers.config_validation as cv
+import aiohttp
 
 from .async_api import CannotConnect, InvalidAuth, ReefApi
 from .const import (
